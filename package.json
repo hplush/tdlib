@@ -1,0 +1,22 @@
+{
+  "name": "@hplush/tdlib",
+  "version": "1.8.70",
+  "description": "TDLib, Telegram’s own library, as WebAssembly for Slow Reader",
+  "license": "BSL-1.0",
+  "repository": "hplush/tdlib",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "exports": {
+    "./td_wasm.js": "./dist/td_wasm.js",
+    "./td_wasm.wasm": "./dist/td_wasm.wasm"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "node build.ts",
+    "update": "node update.ts"
+  }
+}

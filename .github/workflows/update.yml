@@ -1,0 +1,39 @@
+name: New Version
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+permissions: {}
+jobs:
+  update:
+    name: Update TDLib
+    permissions:
+      # To push the commit with the new version
+      contents: write
+      # To start the release, since a push by workflow starts nothing
+      actions: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+      - name: Update TDLib version
+        run: node --run update
+      - name: Push the update and start the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --quiet; then
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit --all \
+            --message "Update TDLib to $(node -p "require('./package.json').version")"
+          git push "https://x-access-token:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git" HEAD:main
+          gh workflow run release.yml --repo "$GITHUB_REPOSITORY" --ref main
